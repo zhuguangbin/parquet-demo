@@ -12,26 +12,30 @@ import scala.collection.mutable.ArrayBuffer
 
 object SessionLogParquetDemo {
 
+  def toNormalCookie(cookiebytes: ArrayBuffer[Int]) = (for (i <- 0 until cookiebytes.length - 1)
+    yield ((cookiebytes(i).toByte & 0xf0) >>> 4).toString + ((cookiebytes(i).toByte & 0x0f)).toString).mkString +
+    ((cookiebytes(11).toByte & 0xFF) >>> 4)
+
   def main(args: Array[String]) {
 
     val sc = new SparkContext(
       new SparkConf()
-      .setAppName("SparkSQL:[demo][SparkSQLUsingSessionLogParquet]"))
+        .setAppName("SparkSQL:[demo][SparkSQLUsingSessionLogParquet]"))
     val sqlContext = new org.apache.spark.sql.hive.HiveContext(sc)
     import sqlContext.implicits._
 
     // Create a DataFrame from Parquet files
     val df = sqlContext.parquetFile("/mvad/warehouse/session/dspan/date=2015-05-01/")
     // Your can alsoCreate a DataFrame from data sources
-//    val df = sqlContext.load("/mvad/warehouse/session/dspan/date=2015-05-01/","parquet")
+    //    val df = sqlContext.load("/mvad/warehouse/session/dspan/date=2015-05-01/","parquet")
     df.registerTempTable("sessionlog")
     sqlContext.tableNames.foreach(println)
     df.printSchema()
 
-    sqlContext.udf.register("intarr2str",(array:ArrayBuffer[Int]) => array.mkString(""))
+    sqlContext.udf.register("toNormalCookie", toNormalCookie _)
     val sql1 =
       """
-        |select intarr2str(cookie) as cookiestr,eventTime,eventType,geoInfo.country as country,
+        |select toNormalCookie(cookie) as cookiestr,eventTime,eventType,geoInfo.country as country,
         |geoInfo.province as province from sessionlog limit 10
       """.stripMargin
     val sample = sqlContext.sql(sql1)
@@ -57,8 +61,8 @@ object SessionLogParquetDemo {
     result.rdd.saveAsObjectFile("/tmp/result-sequence")
 
     // bug api, only create to default DB
-//    result.saveAsTable("result")
-//    result.insertInto("result")
+    //    result.saveAsTable("result")
+    //    result.insertInto("result")
 
     sc.stop()
   }
