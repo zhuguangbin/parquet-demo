@@ -63,15 +63,7 @@
 
     <dependency>
       <groupId>org.apache.parquet</groupId>
-      <artifactId>parquet</artifactId>
-      <version>${parquet.version}</version>
-      <type>pom</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.parquet</groupId>
       <artifactId>parquet-thrift</artifactId>
-      <version>${parquet.version}</version>
     </dependency>
 
     <dependency>
