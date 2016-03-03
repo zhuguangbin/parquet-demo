@@ -17,7 +17,7 @@ fi
 DATE=$1
 LOGDIR="$FWDIR"/logs
 PIGDIR="$FWDIR"/pig
-PIGSCRIPT="$PIGDIR"/parquet-demo.pig
+PIGSCRIPT=`ls "$PIGDIR"/parquet-demo.pig`
 
 source /opt/mv-bash/helper-func.sh
 
@@ -29,7 +29,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # run pig job
-pig --param "date=$DATE" $DIR/$PIGSCRIPT > $LOGDIR/pig-demo.log
+pig -param date=$DATE $PIGSCRIPT > $LOGDIR/pig-demo.log
 
 if [ $? -ne 0 ]; then
     echo -e "`date +"%Y-%m-%d %T"`\tERROR\tjob failed, exit."

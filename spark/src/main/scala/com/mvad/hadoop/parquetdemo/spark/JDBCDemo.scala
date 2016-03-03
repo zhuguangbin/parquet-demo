@@ -14,8 +14,8 @@ object JDBCDemo {
     val sqlContext = new org.apache.spark.sql.SQLContext(sc)
 
     val jdbcDF = sqlContext.load("jdbc",
-      Map("url" -> "jdbc:mysql://st1dg:3306/hadoop","dbtable" -> "hadoop.sparksql_history",
-        "user" -> "hadoop", "password" -> "RNymee2527#"))
+      Map("url" -> "jdbc:mysql://adm1ss.prod.mediav.com:3306/hadoop","dbtable" -> "hadoop.sparksql_history",
+        "user" -> "root", "password" -> "root"))
     jdbcDF.registerTempTable("sparksql_history")
     sqlContext.tableNames.foreach(println)
     jdbcDF.printSchema()

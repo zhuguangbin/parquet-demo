@@ -12,19 +12,6 @@ import scala.collection.mutable.ArrayBuffer
 
 object SessionLogParquetDemo {
 
-  def toNormalCookie(cookiebytes: ArrayBuffer[Int]) = if (cookiebytes.length != 12) {
-    "???????????????????????"
-  } else {
-
-    val firstPart = (
-      for (i <- 0 until cookiebytes.length - 1) yield
-      ((cookiebytes(i).toByte & 0xf0) >>> 4).toString + ((cookiebytes(i).toByte & 0x0f)).toString
-      ).mkString
-    val lastPart = ((cookiebytes(11).toByte & 0xFF) >>> 4)
-
-    firstPart + lastPart
-  }
-
   def main(args: Array[String]) {
 
     val sc = new SparkContext(
@@ -34,27 +21,18 @@ object SessionLogParquetDemo {
     import sqlContext.implicits._
 
     // Create a DataFrame from Parquet files
-    val df = sqlContext.parquetFile("/mvad/warehouse/session/dspan/date=2015-05-01/")
+    val df = sqlContext.read.format("parquet").load("/mvad/warehouse/session/dspan/date=2016-03-01/")
     // Your can alsoCreate a DataFrame from data sources
     //    val df = sqlContext.load("/mvad/warehouse/session/dspan/date=2015-05-01/","parquet")
     df.registerTempTable("sessionlog")
     sqlContext.tableNames.foreach(println)
     df.printSchema()
 
-    sqlContext.udf.register("toNormalCookie", toNormalCookie _)
-    val sql1 =
-      """
-        |select toNormalCookie(cookie) as cookiestr,eventTime,eventType,geoInfo.country as country,
-        |geoInfo.province as province from sessionlog limit 10
-      """.stripMargin
-    val sample = sqlContext.sql(sql1)
-    sample.show()
-
-    val sql2 =
+    val sql =
       """
         |select eventType, count(cookie) as count from sessionlog group by eventType
       """.stripMargin
-    val result = sqlContext.sql(sql2)
+    val result = sqlContext.sql(sql)
     result.cache()
 
     // only show 20 records
@@ -65,7 +43,7 @@ object SessionLogParquetDemo {
     result.collect().map(_.mkString(",")).foreach(println)
 
     //save result
-    result.saveAsParquetFile("/tmp/result-parquet")
+    result.write.format("parquet").save("/tmp/result-parquet")
     result.rdd.saveAsTextFile("/tmp/result-txt")
     result.rdd.saveAsObjectFile("/tmp/result-sequence")
 

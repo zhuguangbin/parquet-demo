@@ -13,12 +13,13 @@ if [ $# != 2 ]; then
   print_usage
   exit
 fi
-
-HADOOP_JAR="$FWDIR"/lib/parquet-mapreduce-demo_2.10-0.0.1-SNAPSHOT.jar
+IN=$1
+OUT=$2
+HADOOP_JAR=`ls "$FWDIR"/lib/parquet-mapreduce-demo*.jar`
 
 LOGDIR="$FWDIR"/logs
 
-hadoop jar $HADOOP_JAR com.mvad.hadoop.parquetdemo.mapreduce.CookieEventCountByPublisher
+hadoop jar $HADOOP_JAR com.mvad.hadoop.parquetdemo.mapreduce.CookieEventCountByPublisher $IN $OUT
 
 
 

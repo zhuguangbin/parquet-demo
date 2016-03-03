@@ -95,22 +95,27 @@
         <include>**/*</include>
       </includes>
     </fileSet>
-  </fileSets>
 
-  <dependencySets>
-    <dependencySet>
-      <outputDirectory>lib</outputDirectory>
-      <useTransitiveDependencies>true</useTransitiveDependencies>
-      <unpack>false</unpack>
-      <scope>runtime</scope>
-      <useProjectArtifact>true</useProjectArtifact>
+    <fileSet>
+      <directory>
+        ${project.parent.basedir}/spark/target/
+      </directory>
+      <outputDirectory>/lib</outputDirectory>
       <includes>
-        <include>*:*:jar</include>
+        <include>**/*-jar-with-dependencies.jar</include>
       </includes>
-      <excludes>
-        <exclude>org.apache.hadoop:*:jar</exclude>
-      </excludes>
-    </dependencySet>
-  </dependencySets>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${project.parent.basedir}/mapreduce/target/
+      </directory>
+      <outputDirectory>/lib</outputDirectory>
+      <includes>
+        <include>**/*-jar-with-dependencies.jar</include>
+      </includes>
+    </fileSet>
+
+  </fileSets>
 
 </assembly>

@@ -4,7 +4,7 @@ FWDIR="$(cd "`dirname "$0"`"/..; pwd)"
 
 set -e
 
-SPARK_JAR="$FWDIR"/lib/parquet-spark-demo_2.10-0.0.1-SNAPSHOT.jar
+SPARK_JAR=`ls "$FWDIR"/lib/parquet-spark-demo*.jar`
 
 LOGDIR="$FWDIR"/logs
 

@@ -14,9 +14,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import parquet.hadoop.ParquetInputFormat;
-import parquet.hadoop.api.ReadSupport;
-import parquet.hadoop.thrift.ParquetThriftInputFormat;
+import org.apache.parquet.hadoop.ParquetInputFormat;
+import org.apache.parquet.hadoop.api.ReadSupport;
+import org.apache.parquet.hadoop.thrift.ParquetThriftInputFormat;
 
 import java.io.IOException;
 
@@ -88,9 +88,6 @@ public class CookieEventCountByPublisher extends Configured implements Tool {
     conf.set(ReadSupport.PARQUET_READ_SCHEMA, readSchema);
     conf.setBoolean(ParquetInputFormat.TASK_SIDE_METADATA, true);
 
-    conf.setBoolean("elephantbird.use.combine.input.format", true);
-    conf.setInt("elephantbird.combine.split.size",1073741824);
-
     // setup job
     Job job = Job.getInstance(conf);
     job.setJobName("CookieEventCountByPublisher");
@@ -101,9 +98,7 @@ public class CookieEventCountByPublisher extends Configured implements Tool {
     job.setOutputKeyClass(IntWritable.class);
     job.setOutputValueClass(IntWritable.class);
 
-    // set InputFormatClass to be DelegateCombineFileInputFormat to Combine Small Splits
-    job.setInputFormatClass(DelegateCombineFileInputFormat.class);
-    DelegateCombineFileInputFormat.setCombinedInputFormatDelegate(job.getConfiguration(), ParquetThriftInputFormat.class);
+    job.setInputFormatClass(ParquetThriftInputFormat.class);
     ParquetThriftInputFormat.addInputPath(job, in);
 
     // be sure to set ParquetThriftInputFormat ReadSupportClass and ThriftClass
